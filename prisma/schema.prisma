@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @db.Text @default(uuid())
+  username String @unique @db.VarChar(20)
+  phone String @unique @db.VarChar(8)
+  profileImage String?
+  token String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relation
+  ownedContacts Contact[] @relation("OwnerToContact")
+  senderMessages Message[] @relation("SenderMessage")
+  receiverMessages Message[] @relation("ReceiverMessage")
+}
+
+model Contact {
+  id String @id @db.Text @default(uuid())
+  ownerId String @db.Text
+  savedId String @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relation
+  owner User @relation("OwnerToContact", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@unique([ownerId, savedId])
+
+}
+
+model Message {
+  id String @id @db.Text @default(uuid())
+  senderId String @db.Text
+  receiverId String @db.Text
+  body String @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relation
+  sender User @relation("SenderMessage", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("ReceiverMessage", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([senderId, receiverId])
+}
