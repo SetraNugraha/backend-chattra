@@ -94,7 +94,9 @@ export class AuthService {
 
     // Check phone
     if (!user) {
-      throw new NotFoundException('Phone not register yet.');
+      throw new NotFoundException({
+        fieldErrors: { phone: ['phone not register yet.'] },
+      });
     }
 
     // Set Payload
@@ -102,12 +104,13 @@ export class AuthService {
     const tokens = this.generateToken(payload);
 
     // Update token on db
-    await this.userService.updateToken(user.phone, tokens.refreshToken);
+    await this.userService.updateToken(user.id, tokens.refreshToken);
 
     // Set token to cookies
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: 'lax',
+      path: '/',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
@@ -157,12 +160,7 @@ export class AuthService {
         secret: process.env.JWT_REFRESH_TOKEN,
       });
 
-      await this.prisma.user.update({
-        where: { phone: payload.phone },
-        data: {
-          token: null,
-        },
-      });
+      await this.userService.deleteToken(payload.sub);
     }
 
     res.clearCookie('refresh_token');

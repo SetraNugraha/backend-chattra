@@ -54,11 +54,20 @@ export class UserService {
     });
   }
 
-  async updateToken(phone: string, token: string) {
+  async updateToken(userId: string, token: string) {
     return await this.prisma.user.update({
-      where: { phone: phone },
+      where: { id: userId },
       data: {
         token,
+      },
+    });
+  }
+
+  async deleteToken(userId: string) {
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        token: null,
       },
     });
   }
