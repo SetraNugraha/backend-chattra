@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   Body,
@@ -8,7 +7,6 @@ import {
   Post,
   Req,
   Res,
-  Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto, RegisterSchema } from './dto/register.dto';
@@ -40,7 +38,7 @@ export class AuthController {
     return successResponse('Login success', result);
   }
 
-  @Get('refresh-token')
+  @Post('refresh-token')
   @HttpCode(200)
   async refreshToken(
     @Req() req: Request,
