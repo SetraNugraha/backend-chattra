@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { GetUserDto } from './dto/get-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -19,7 +23,11 @@ export class UserService {
   }
 
   async findById(userId: string): Promise<GetUserDto | null> {
-    return await this.prisma.user.findUnique({
+    if (!userId) {
+      throw new BadRequestException('user id required');
+    }
+
+    const result = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -28,6 +36,12 @@ export class UserService {
         profileImage: true,
       },
     });
+
+    if (!result) {
+      throw new NotFoundException('user not found');
+    }
+
+    return result;
   }
 
   async findUserByPhone(phone: string): Promise<GetUserDto | null> {
