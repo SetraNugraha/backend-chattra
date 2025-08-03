@@ -25,6 +25,7 @@ model User {
 
   // Relation
   ownedContacts Contact[] @relation("OwnerToContact")
+  usersProfile Contact[] @relation("UsersProfile")
   senderMessages Message[] @relation("SenderMessage")
   receiverMessages Message[] @relation("ReceiverMessage")
 }
@@ -39,6 +40,7 @@ model Contact {
 
   // Relation
   owner User @relation("OwnerToContact", fields: [ownerId], references: [id], onDelete: Cascade)
+  users User @relation("UsersProfile", fields: [savedId], references: [id], onDelete: Cascade)
 
   @@unique([ownerId, savedId])
 

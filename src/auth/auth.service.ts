@@ -134,7 +134,7 @@ export class AuthService {
       });
 
       // Update token on db
-      await this.userService.updateToken(payload.phone, tokens.refreshToken);
+      await this.userService.updateToken(payload.sub, tokens.refreshToken);
 
       // Set token to cookies
       res.cookie('refresh_token', tokens.refreshToken, {
@@ -146,6 +146,7 @@ export class AuthService {
 
       return { accessToken: tokens.accessToken };
     } catch (error) {
+      console.error('refresh token error: ', error);
       if (error instanceof ForbiddenException) {
         throw new ForbiddenException('Invalid refresh token');
       }

@@ -8,6 +8,7 @@ import {
   Post,
   Req,
   Res,
+  Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto, RegisterSchema } from './dto/register.dto';
@@ -39,7 +40,7 @@ export class AuthController {
     return successResponse('Login success', result);
   }
 
-  @Post('refresh-token')
+  @Get('refresh-token')
   @HttpCode(200)
   async refreshToken(
     @Req() req: Request,
