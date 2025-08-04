@@ -53,11 +53,21 @@ export class ContactService {
     // Check phone are already register or no
     const existsUser = await this.userService.findUserByPhone(phone);
     if (!existsUser) {
-      throw new NotFoundException('Phone number not found');
+      throw new NotFoundException({
+        message: 'Validation error',
+        fieldErrors: {
+          phone: ['Phone number not found'],
+        },
+      });
     }
 
     if (ownerId === existsUser.id) {
-      throw new ConflictException('you cant save your own phone number');
+      throw new ConflictException({
+        message: 'Validation error',
+        fieldErrors: {
+          phone: ['you cant save your own phone number'],
+        },
+      });
     }
 
     // Validate contact already saved or no
@@ -71,7 +81,12 @@ export class ContactService {
     });
 
     if (hasSaved) {
-      throw new ConflictException(`${phone} already saved in your contact`);
+      throw new ConflictException({
+        message: 'Validation error',
+        fieldErrors: {
+          phone: [`${phone} already saved in your contact`],
+        },
+      });
     }
 
     // Save contact

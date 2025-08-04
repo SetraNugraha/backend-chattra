@@ -35,7 +35,7 @@ export class AuthService {
 
       if (existsPhone) {
         throw new ConflictException({
-          message: 'Validation failed',
+          message: 'Validation error',
           fieldErrors: {
             phone: ['phone already exists'],
           },
@@ -44,7 +44,7 @@ export class AuthService {
 
       if (existsUsername) {
         throw new ConflictException({
-          message: 'Validation failed',
+          message: 'Validation error',
           fieldErrors: {
             phone: ['username already exists'],
           },
