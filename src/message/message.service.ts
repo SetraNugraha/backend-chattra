@@ -15,20 +15,20 @@ export class MessageService {
     private contactService: ContactService,
   ) {}
 
-  async getMessageByReceiverId(senderId: string, receiverId: string) {
-    if (senderId === receiverId) {
+  async getConversation(authUserId: string, otherId: string) {
+    if (authUserId === otherId) {
       throw new ConflictException('you cant message to your self');
     }
 
     // Check Receiver is exists
-    const receiver = await this.userService.findById(receiverId);
+    const receiver = await this.userService.findById(otherId);
     if (!receiver) {
       throw new NotFoundException('receiver user not found');
     }
 
     // Only saved contact can send message
     const isInContact = await this.contactService.isInContact(
-      senderId,
+      authUserId,
       receiver.id,
     );
     if (!isInContact) {
@@ -37,8 +37,19 @@ export class MessageService {
 
     const result = await this.prisma.message.findMany({
       where: {
-        senderId,
-        receiverId,
+        OR: [
+          {
+            senderId: authUserId,
+            receiverId: otherId,
+          },
+          {
+            senderId: otherId,
+            receiverId: authUserId,
+          },
+        ],
+      },
+      orderBy: {
+        createdAt: 'asc',
       },
     });
 

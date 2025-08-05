@@ -20,14 +20,14 @@ export class MessageController {
   constructor(private messageService: MessageService) {}
 
   @UseGuards(AuthGuard)
-  @Get('/:receiverId')
+  @Get('/:otherId')
   async getMessage(
     @AuthUser() authUser: AuthUserDto,
-    @Param('receiverId') receiverId: string,
+    @Param('otherId') otherId: string,
   ) {
-    const result = await this.messageService.getMessageByReceiverId(
+    const result = await this.messageService.getConversation(
       authUser.sub,
-      receiverId,
+      otherId,
     );
 
     return successResponse('get message success', result);
