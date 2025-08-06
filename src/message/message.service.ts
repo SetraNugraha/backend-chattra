@@ -6,6 +6,7 @@ import {
 import { ContactService } from 'src/contact/contact.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
+import { MessageGateway } from './message.gateway';
 
 @Injectable()
 export class MessageService {
@@ -13,6 +14,7 @@ export class MessageService {
     private prisma: PrismaService,
     private userService: UserService,
     private contactService: ContactService,
+    private messageGateway: MessageGateway,
   ) {}
 
   async getConversation(authUserId: string, otherId: string) {
@@ -83,6 +85,8 @@ export class MessageService {
         body,
       },
     });
+
+    this.messageGateway.sendMessageToReceiver(receiverId, result);
 
     return result;
   }
