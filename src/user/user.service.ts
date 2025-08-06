@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   BadRequestException,
   Injectable,
@@ -5,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { GetUserDto } from './dto/get-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { cloudinary } from 'src/utils/cloudinary';
+import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 
 @Injectable()
 export class UserService {
@@ -84,5 +88,49 @@ export class UserService {
         token: null,
       },
     });
+  }
+
+  async updateProfileImage(userId: string, image: Express.Multer.File) {
+    const existsUser: UpdateProfileImageDto | null =
+      await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          username: true,
+          phone: true,
+          profileImage: true,
+          imagePublicId: true,
+        },
+      });
+
+    if (!existsUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Delete old image from cloudinary
+    if (existsUser.imagePublicId) {
+      await cloudinary.uploader.destroy(existsUser.imagePublicId);
+    }
+
+    const secureUrl = image.path;
+    const publicId = image.filename;
+
+    const result = await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        profileImage: secureUrl,
+        imagePublicId: publicId,
+      },
+      select: {
+        id: true,
+        username: true,
+        phone: true,
+        profileImage: true,
+      },
+    });
+
+    return result;
   }
 }

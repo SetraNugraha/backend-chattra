@@ -17,7 +17,8 @@ model User {
   id String @id @db.Text @default(uuid())
   username String @unique @db.VarChar(20)
   phone String @unique @db.VarChar(8)
-  profileImage String?
+  profileImage String? @db.Text // URL Image (secure url)
+  imagePublicId String? @db.Text //  Cloudinary Public ID
   token String? @db.Text
 
   createdAt DateTime @default(now())
