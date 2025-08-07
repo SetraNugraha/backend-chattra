@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { GetUserDto } from './dto/get-user.dto';
@@ -132,5 +131,33 @@ export class UserService {
     });
 
     return result;
+  }
+
+  async deleteProfileImage(userId: string) {
+    const existsUser = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!existsUser) {
+      throw new NotFoundException('user not found');
+    }
+
+    if (!existsUser.profileImage || !existsUser.imagePublicId) {
+      throw new NotFoundException('user does not have a profile image');
+    }
+
+    try {
+      await cloudinary.uploader.destroy(existsUser.imagePublicId);
+    } catch (error) {
+      console.error('Delete image in cludinary error: ', error);
+      throw new InternalServerErrorException(
+        'Failed delete image from cloudinary',
+      );
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { profileImage: null, imagePublicId: null },
+    });
   }
 }

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Body,
@@ -7,6 +5,7 @@ import {
   Get,
   NotFoundException,
   Param,
+  Patch,
   Post,
   UploadedFile,
   UseGuards,
@@ -52,7 +51,7 @@ export class UserController {
     return successResponse('get user by id success', result);
   }
 
-  @Post('update-profile-image/:userId')
+  @Patch('update-profile-image/:userId')
   @UseInterceptors(FileInterceptor('file', { storage }))
   async updateProfileImage(
     @AuthUser() authUser: AuthUserDto,
@@ -68,5 +67,11 @@ export class UserController {
     );
 
     return successResponse('update profile image success', result);
+  }
+
+  @Patch('delete-profile-image/:userId')
+  async deleteProfileImage(@AuthUser() authUser: AuthUserDto) {
+    await this.userService.deleteProfileImage(authUser.sub);
+    return successResponse('delete profile success', []);
   }
 }
