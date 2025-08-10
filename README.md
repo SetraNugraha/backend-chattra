@@ -9,7 +9,7 @@
 Clone the project
 
 ```bash
-  git clone https://github.com/SetraNugraha/frontend-chattra
+  git clone https://github.com/SetraNugraha/backend-chattra
 ```
 
 Go to the project directory
@@ -30,12 +30,26 @@ Environtment
   copy .env.example to .env, set the value as needed
 ```
 
-Run Project
+### Setup DB/Prisma
+
+Generate Prisma (Make sure you have alredy create a database on Postgesql)
 
 ```bash
-  npm run dev
+  npx prisma generate
 ```
 
-## 🔗 Backend Repository
+Create Table on PostgreSQL
 
-https://github.com/SetraNugraha/backend-chattra
+```bash
+  npx prisma db push
+```
+
+### Run project
+
+```bash
+  npm run start:dev
+```
+
+## 🔗 Frontend Repository
+
+https://github.com/SetraNugraha/frontend-chattra
